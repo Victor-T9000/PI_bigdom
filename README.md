@@ -1,2 +1,3 @@
-# PI_bigdom
-Projeto Integrador - El BigDom 
+# PI_bigdom (Senac)
+
+Projeto Integrador 2026/02 - El BigDom 
