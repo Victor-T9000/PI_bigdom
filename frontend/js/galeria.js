@@ -4,7 +4,7 @@ async function compartilharMidia(id) {
     if (navigator.share) {
         try {
             await navigator.share({
-                title: 'El Bigodom - Galeria',
+                title: 'El BigDom - Galeria',
                 url: url
             });
         } catch (error) {
