@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meus Cupons - El Bigodom</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar container">
+            <a href="index.html" class="logo">
+                <span class="yellow">EL</span><span class="black">BIGODOM</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html">Início</a>
+                <a href="barbearias.html">Barbearias</a>
+                <a href="galeria.html">Galeria</a>
+                <div id="user-menu" class="user-menu"></div>
+            </div>
+        </nav>
+    </header>
+    
+    <main class="container" style="padding: 40px 0;">
+        <h1 style="margin-bottom: 8px;">Meus Cupons</h1>
+        <p style="margin-bottom: 24px; color: var(--gray-dark);">Seu programa de fidelidade</p>
+        
+        <div class="stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 40px;">
+            <div class="card" style="text-align: center;">
+                <div class="card-body">
+                    <h2 id="total-cupons" style="color: var(--yellow);">0</h2>
+                    <p>Cupons Disponíveis</p>
+                </div>
+            </div>
+            <div class="card" style="text-align: center;">
+                <div class="card-body">
+                    <h2 id="total-agendamentos" style="color: var(--yellow);">0</h2>
+                    <p>Agendamentos Realizados</p>
+                </div>
+            </div>
+        </div>
+        
+        <h2 style="margin-bottom: 20px;">Cupons Ativos</h2>
+        <div id="cupons-ativos" class="cupons-grid" style="display: grid; gap: 16px;">
+            <div class="loading-spinner">Carregando cupons...</div>
+        </div>
+        
+        <h2 style="margin: 40px 0 20px;">Histórico de Cupons</h2>
+        <div id="cupons-historicos" class="cupons-grid" style="display: grid; gap: 16px;">
+            <div class="loading-spinner">Carregando histórico...</div>
+        </div>
+    </main>
+    
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 El Bigodom - Todos os direitos reservados</p>
+        </div>
+    </footer>
+    
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/cupom.js"></script>
+    <script>
+        async function carregarDados() {
+            mostrarLoading(true);
+            
+            try {
+                const [cupons, agendamentos] = await Promise.all([
+                    API.meusCupons(),
+                    API.meusAgendamentos()
+                ]);
+                
+                const cuponsAtivos = cupons.filter(c => !c.usado && new Date(c.data_validade) > new Date());
+                const cuponsUsados = cupons.filter(c => c.usado || new Date(c.data_validade) <= new Date());
+                const totalAgendamentos = agendamentos.length;
+                
+                document.getElementById('total-cupons').textContent = cuponsAtivos.length;
+                document.getElementById('total-agendamentos').textContent = totalAgendamentos;
+                
+                // Cupons Ativos
+                const ativosContainer = document.getElementById('cupons-ativos');
+                if (cuponsAtivos.length === 0) {
+                    ativosContainer.innerHTML = '<div class="card"><div class="card-body"><p>Você não tem cupons ativos no momento.</p><p>Complete 5 agendamentos para ganhar um cupom!</p></div></div>';
+                } else {
+                    ativosContainer.innerHTML = cuponsAtivos.map(cupom => `
+                        <div class="card" style="border-left: 4px solid var(--yellow);">
+                            <div class="card-body" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                                <div>
+                                    <h3>${getTipoCupom(cupom.tipo)}</h3>
+                                    ${cupom.descricao ? `<p>${cupom.descricao}</p>` : ''}
+                                    <p style="font-size: 0.875rem; color: var(--gray-dark);">Válido até: ${formatarData(cupom.data_validade)}</p>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div class="codigo-cupom" style="background: var(--gray); padding: 8px 16px; border-radius: 8px; font-family: monospace; font-size: 1.1rem;">
+                                        ${cupom.codigo}
+                                    </div>
+                                    <button class="btn-secondary" style="margin-top: 8px;" onclick="copiarCodigo('${cupom.codigo}')">Copiar Código</button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                
+                // Cupons Histórico
+                const historicoContainer = document.getElementById('cupons-historicos');
+                if (cuponsUsados.length === 0) {
+                    historicoContainer.innerHTML = '<div class="card"><div class="card-body"><p>Nenhum cupom utilizado ainda.</p></div></div>';
+                } else {
+                    historicoContainer.innerHTML = cuponsUsados.map(cupom => `
+                        <div class="card" style="opacity: 0.7;">
+                            <div class="card-body" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                                <div>
+                                    <h3>${getTipoCupom(cupom.tipo)}</h3>
+                                    ${cupom.descricao ? `<p>${cupom.descricao}</p>` : ''}
+                                    <p style="font-size: 0.875rem; color: var(--gray-dark);">
+                                        ${cupom.usado ? '✓ Usado' : `Expirado em ${formatarData(cupom.data_validade)}`}
+                                    </p>
+                                </div>
+                                <div>
+                                    <span class="badge ${cupom.usado ? 'badge-success' : 'badge-danger'}">
+                                        ${cupom.usado ? 'Utilizado' : 'Expirado'}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                
+            } catch (error) {
+                mostrarMensagem('Erro ao carregar cupons', 'error');
+            } finally {
+                mostrarLoading(false);
+            }
+        }
+        
+        function getTipoCupom(tipo) {
+            const tipos = {
+                'VALE50': '🎫 Vale-desconto de R$50',
+                'VALE100': '🎫 Vale-desconto de R$100',
+                'CORTE_GRATIS': '✂️ Corte Grátis'
+            };
+            return tipos[tipo] || tipo;
+        }
+        
+        function copiarCodigo(codigo) {
+            navigator.clipboard.writeText(codigo);
+            mostrarMensagem('Código copiado! Apresente na barbearia.', 'success');
+        }
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            const autenticado = await verificarAutenticacao(true);
+            if (autenticado) {
+                atualizarMenuUsuario();
+                carregarDados();
+            }
+        });
+    </script>
+</body>
+</html>

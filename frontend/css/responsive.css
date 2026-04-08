@@ -1,0 +1,32 @@
+@media (max-width: 480px) {
+    .container {
+        padding: 0 16px;
+    }
+    
+    .btn-primary, .btn-secondary {
+        padding: 8px 16px;
+        font-size: 0.875rem;
+    }
+    
+    .hero {
+        padding: 40px 0;
+    }
+    
+    .hero h1 {
+        font-size: 1.5rem;
+    }
+    
+    .horarios-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .modal-content {
+        width: 95%;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .barbearias-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

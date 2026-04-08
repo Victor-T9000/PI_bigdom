@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Bigodom - Sua Barbearia</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar container">
+            <a href="index.html" class="logo">
+                <span class="yellow">EL</span><span class="black">BIGODOM</span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="index.html">Início</a>
+                <a href="barbearias.html">Barbearias</a>
+                <a href="galeria.html">Galeria</a>
+                <div id="user-menu" class="user-menu"></div>
+            </div>
+        </nav>
+    </header>
+    
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>Estilo e <span class="highlight">Atitude</span></h1>
+                <p>Agende seu horário nas melhores barbearias e saia no estilo</p>
+                <a href="barbearias.html" class="btn-primary">Agendar Agora</a>
+            </div>
+        </section>
+        
+        <section class="container">
+            <h2 style="text-align: center; margin: 40px 0 20px;">Barbearias em Destaque</h2>
+            <div class="barbearias-grid" id="barbearias-grid">
+                <div class="loading-spinner">Carregando barbearias...</div>
+            </div>
+        </section>
+        
+        <section style="background: var(--black); color: white; padding: 60px 0; margin-top: 40px;">
+            <div class="container" style="text-align: center;">
+                <h2 style="margin-bottom: 16px;">Como Funciona</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 32px; margin-top: 40px;">
+                    <div>
+                        <div style="font-size: 2.5rem; color: var(--yellow);">1</div>
+                        <h3>Escolha a Barbearia</h3>
+                        <p>Selecione a barbearia mais próxima de você</p>
+                    </div>
+                    <div>
+                        <div style="font-size: 2.5rem; color: var(--yellow);">2</div>
+                        <h3>Escolha o Barbeiro</h3>
+                        <p>Veja avaliações e escolha o profissional</p>
+                    </div>
+                    <div>
+                        <div style="font-size: 2.5rem; color: var(--yellow);">3</div>
+                        <h3>Agende o Horário</h3>
+                        <p>Selecione o melhor horário para você</p>
+                    </div>
+                    <div>
+                        <div style="font-size: 2.5rem; color: var(--yellow);">4</div>
+                        <h3>Confirme e Compareça</h3>
+                        <p>Receba lembretes e não perca o horário</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 El Bigodom - Todos os direitos reservados</p>
+            <p style="margin-top: 8px; color: #888;">Estilo e atitude para o homem moderno</p>
+        </div>
+    </footer>
+    
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/barbearias.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            atualizarMenuUsuario();
+            await carregarBarbearias();
+        });
+    </script>
+</body>
+</html>
