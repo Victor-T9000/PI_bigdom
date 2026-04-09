@@ -4,7 +4,8 @@ from utils.database import execute_query
 
 barbearias_bp = Blueprint('barbearias', __name__, url_prefix='/api/barbearias')
 
-@barbearias_bp.route('/', methods=['GET'])
+# CORRIGIDO: remova a barra '/'
+@barbearias_bp.route('', methods=['GET'])  # ← sem barra
 def listar_barbearias():
     cidade = request.args.get('cidade')
     busca = request.args.get('busca')
@@ -36,7 +37,8 @@ def get_barbearia(barbearia_id):
 
     return jsonify(barbearia)
 
-@barbearias_bp.route('/', methods=['POST'])
+# CORRIGIDO: também remova a barra aqui
+@barbearias_bp.route('', methods=['POST'])  # ← sem barra
 def cadastrar_barbearia():
     data = request.json
 

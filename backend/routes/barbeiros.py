@@ -4,7 +4,7 @@ from utils.database import execute_query
 
 barbeiros_bp = Blueprint('barbeiros', __name__, url_prefix='/api/barbeiros')
 
-@barbeiros_bp.route('/', methods=['GET'])
+@barbeiros_bp.route('', methods=['GET']) 
 def listar_barbeiros():
     barbearia_id = request.args.get('barbearia_id')
     servico_id = request.args.get('servico_id')
