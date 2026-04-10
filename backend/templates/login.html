@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - El Bigdom</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/responsive.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar container">
+            <a href="/" class="logo">
+                <span class="yellow">EL</span><span class="black">BIGDOM</span>
+            </a>
+            <div class="nav-links">
+                <a href="/">Início</a>
+                <a href="/barbearias">Barbearias</a>
+                <a href="/galeria">Galeria</a>
+                <a href="/login" class="btn-outline">Entrar</a>
+                <a href="/cadastro" class="btn-primary">Cadastrar</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container" style="min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 60px 0;">
+        <div class="card" style="max-width: 450px; width: 100%;">
+            <div class="card-header" style="text-align: center;">
+                <h2>Bem-vindo de volta!</h2>
+                <p style="color: var(--yellow);">Faça login para continuar</p>
+            </div>
+            <div class="card-body">
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="email">E-mail</label>
+                        <input type="email" id="email" name="email" required placeholder="seu@email.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="senha">Senha</label>
+                        <input type="password" id="senha" name="senha" required placeholder="••••••••">
+                    </div>
+                    
+                    <button type="submit" class="btn-primary btn-block">Entrar</button>
+                </form>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <p>Não tem uma conta? <a href="/cadastro" style="color: var(--yellow);">Cadastre-se</a></p>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 El Bigdom - Todos os direitos reservados</p>
+        </div>
+    </footer>
+
+    <script src="/static/js/config.js"></script>
+    <script src="/static/js/utils.js"></script>
+    <script src="/static/js/auth.js"></script>
+    <script src="/static/js/api.js"></script>
+    
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const senha = document.getElementById('senha').value;
+            
+            mostrarLoading(true);
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, senha })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) throw new Error(data.error);
+                
+                localStorage.setItem('elbigdom_token', data.token);
+                localStorage.setItem('elbigdom_user', JSON.stringify(data.usuario));
+                localStorage.setItem('elbigdom_tipo', data.tipo);
+                
+                mostrarMensagem('Login realizado com sucesso!');
+                window.location.href = '/';
+                
+            } catch (error) {
+                mostrarMensagem(error.message, 'error');
+            } finally {
+                mostrarLoading(false);
+            }
+        });
+    </script>
+</body>
+</html>

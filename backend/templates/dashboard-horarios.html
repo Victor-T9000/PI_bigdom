@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horários - El Bigdom</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar container">
+            <a href="/dashboard-barbearia" class="logo">
+                <span class="yellow">EL</span><span class="black">BIGDOM</span>
+            </a>
+            <div class="nav-links">
+                <a href="/dashboard-barbearia">Dashboard</a>
+                <a href="/dashboard-barbeiros">Barbeiros</a>
+                <a href="/dashboard-servicos">Serviços</a>
+                <a href="/dashboard-agendamentos">Agendamentos</a>
+                <a href="/dashboard-horarios" class="active">Horários</a>
+                <div id="user-menu" class="user-menu"></div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container" style="padding: 40px 0;">
+        <div class="section-header">
+            <h1>⏰ Gerenciar Horários</h1>
+        </div>
+
+        <!-- Seleção de Barbeiro -->
+        <div class="card" style="margin-bottom: 24px;">
+            <div class="card-header">
+                <h3>Selecione o Barbeiro</h3>
+            </div>
+            <div class="card-body">
+                <select id="selecionar-barbeiro" class="barbeiro-select" onchange="carregarHorarios()">
+                    <option value="">Selecione um barbeiro...</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Horários do Barbeiro -->
+        <div id="horarios-section" style="display: none;">
+            <div class="section-header">
+                <h2 id="barbeiro-nome"></h2>
+                <button class="btn-primary" onclick="abrirModalHorario()">+ Adicionar Horário</button>
+            </div>
+
+            <!-- Dias da Semana -->
+            <div class="dias-semana">
+                <div class="dia-card" data-dia="1">
+                    <h3>Segunda-feira</h3>
+                    <div id="horarios-1" class="horarios-dia"></div>
+                    <button class="btn-small btn-outline" onclick="abrirModalHorario(1)">+ Adicionar</button>
+                </div>
+                <div class="dia-card" data-dia="2">
+                    <h3>Terça-feira</h3>
+                    <div id="horarios-2" class="horarios-dia"></div>
+                    <button class="btn-small btn-outline" onclick="abrirModalHorario(2)">+ Adicionar</button>
+                </div>
+                <div class="dia-card" data-dia="3">
+                    <h3>Quarta-feira</h3>
+                    <div id="horarios-3" class="horarios-dia"></div>
+                    <button class="btn-small btn-outline" onclick="abrirModalHorario(3)">+ Adicionar</button>
+                </div>
+                <div class="dia-card" data-dia="4">
+                    <h3>Quinta-feira</h3>
+                    <div id="horarios-4" class="horarios-dia"></div>
+                    <button class="btn-small btn-outline" onclick="abrirModalHorario(4)">+ Adicionar</button>
+                </div>
+                <div class="dia-card" data-dia="5">
+                    <h3>Sexta-feira</h3>
+                    <div id="horarios-5" class="horarios-dia"></div>
+                    <button class="btn-small btn-outline" onclick="abrirModalHorario(5)">+ Adicionar</button>
+                </div>
+                <div class="dia-card" data-dia="6">
+                    <h3>Sábado</h3>
+                    <div id="horarios-6" class="horarios-dia"></div>
+                    <button class="btn-small btn-outline" onclick="abrirModalHorario(6)">+ Adicionar</button>
+                </div>
+                <div class="dia-card" data-dia="7">
+                    <h3>Domingo</h3>
+                    <div id="horarios-7" class="horarios-dia"></div>
+                    <button class="btn-small btn-outline" onclick="abrirModalHorario(7)">+ Adicionar</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de Adicionar/Editar Horário -->
+    <div id="modal-horario" class="modal">
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3 id="modal-title">Adicionar Horário</h3>
+                <span class="close-modal" onclick="fecharModalHorario()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="horario-form">
+                    <input type="hidden" id="horario-id">
+                    <input type="hidden" id="dia-semana">
+                    <div class="form-group">
+                        <label>Dia da Semana</label>
+                        <input type="text" id="dia-nome" readonly disabled style="background: var(--gray);">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="hora-inicio">Hora Início</label>
+                            <input type="time" id="hora-inicio" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="hora-fim">Hora Fim</label>
+                            <input type="time" id="hora-fim" required>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="fecharModalHorario()">Cancelar</button>
+                <button class="btn-primary" onclick="salvarHorario()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 El Bigdom - Todos os direitos reservados</p>
+        </div>
+    </footer>
+
+    <script src="/static/js/config.js"></script>
+    <script src="/static/js/utils.js"></script>
+    <script src="/static/js/auth.js"></script>
+    <script src="/static/js/horarios-crud.js"></script>
+</body>
+</html>

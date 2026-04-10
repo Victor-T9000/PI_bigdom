@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - El Bigdom</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar container">
+            <a href="/dashboard-barbearia" class="logo">
+                <span class="yellow">EL</span><span class="black">BIGODOM</span>
+            </a>
+            <div class="nav-links">
+                <a href="/dashboard-barbearia" class="active">Dashboard</a>
+                <a href="/dashboard-barbeiros">Barbeiros</a>
+                <a href="/dashboard-servicos">Serviços</a>
+                <a href="/dashboard-agendamentos">Agendamentos</a>
+                <a href="/dashboard-horarios">Horários</a>
+                <div id="user-menu" class="user-menu"></div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container" style="padding: 40px 0;">
+        <div class="welcome-section">
+            <h1>Olá, <span id="barbearia-nome">Carregando...</span>!</h1>
+            <p>Bem-vindo ao painel de controle da sua barbearia</p>
+        </div>
+
+        <!-- Cards de Estatísticas -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">✂️</div>
+                <div class="stat-info">
+                    <h3 id="total-barbeiros">0</h3>
+                    <p>Barbeiros</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">💈</div>
+                <div class="stat-info">
+                    <h3 id="total-servicos">0</h3>
+                    <p>Serviços</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📅</div>
+                <div class="stat-info">
+                    <h3 id="agendamentos-hoje">0</h3>
+                    <p>Agendamentos Hoje</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⏳</div>
+                <div class="stat-info">
+                    <h3 id="agendamentos-pendentes">0</h3>
+                    <p>Pendentes</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Agendamentos do Dia -->
+        <div class="section-header">
+            <h2>📅 Agendamentos de Hoje</h2>
+            <button class="btn-outline" onclick="carregarAgendamentosHoje()">Atualizar</button>
+        </div>
+        <div id="agendamentos-hoje-lista" class="agendamentos-lista">
+            <div class="loading-spinner">Carregando agendamentos...</div>
+        </div>
+
+        <!-- Últimos Agendamentos -->
+        <div class="section-header" style="margin-top: 40px;">
+            <h2>📋 Últimos Agendamentos</h2>
+            <a href="/dashboard-agendamentos" class="btn-outline">Ver Todos</a>
+        </div>
+        <div id="ultimos-agendamentos" class="agendamentos-lista">
+            <div class="loading-spinner">Carregando...</div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 El Bigdom - Todos os direitos reservados</p>
+        </div>
+    </footer>
+
+    <script src="/static/js/config.js"></script>
+    <script src="/static/js/utils.js"></script>
+    <script src="/static/js/auth.js"></script>
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>

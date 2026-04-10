@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aprovações - Admin</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar container">
+            <a href="/admin/dashboard" class="logo">
+                <span class="yellow">EL</span><span class="black">BIGODOM</span>
+                <span class="admin-badge">ADMIN</span>
+            </a>
+            <div class="nav-links">
+                <a href="/admin/dashboard">Dashboard</a>
+                <a href="/admin/barbearias">Barbearias</a>
+                <a href="/admin/pendentes" class="active">Aprovações</a>
+                <div id="user-menu" class="user-menu"></div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container" style="padding: 40px 0;">
+        <div class="section-header">
+            <h1>⏳ Barbearias Aguardando Aprovação</h1>
+            <p>Revise e aprove as novas barbearias</p>
+        </div>
+
+        <div id="pendentes-container">
+            <div class="loading-spinner">Carregando...</div>
+        </div>
+    </main>
+
+    <script src="/static/js/config.js"></script>
+    <script src="/static/js/utils.js"></script>
+    <script src="/static/js/auth.js"></script>
+    <script src="/static/js/admin.js"></script>
+</body>
+</html>

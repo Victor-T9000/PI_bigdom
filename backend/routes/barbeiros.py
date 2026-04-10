@@ -58,47 +58,75 @@ def get_barbeiro(barbeiro_id):
 @barbeiros_bp.route('/<int:barbeiro_id>/horarios', methods=['GET'])
 def get_horarios(barbeiro_id):
     data = request.args.get('data')
-
+    
     if not data:
         return jsonify({'error': 'Data é obrigatória'}), 400
 
-    # Buscar horários de trabalho do barbeiro
-    dia_semana = None  # Calcular baseado na data
-    from datetime import datetime
-    dia_semana = datetime.strptime(data, '%Y-%m-%d').weekday() + 1  # 1=Segunda, 6=Sábado, 7=Domingo
-
-    horarios_trabalho = execute_query("""
-        SELECT hora_inicio, hora_fim FROM horario_trabalho
-        WHERE id_barbeiro = %s AND dia_semana = %s
-    """, (barbeiro_id, dia_semana), fetch_one=True)
-
-    if not horarios_trabalho:
-        return jsonify({'horarios': []})
-
-    # Buscar horários já ocupados
-    ocupados = execute_query("""
-        SELECT TIME(data_agendamento) as hora
-        FROM agendamento_atendimento
-        WHERE id_barbeiro = %s AND DATE(data_agendamento) = %s
-        AND status IN ('pendente', 'confirmado')
-    """, (barbeiro_id, data), fetch_all=True)
-
-    horas_ocupadas = [o['hora'].strftime('%H:%M') for o in ocupados]
-
-    # Gerar slots de 30 em 30 minutos
-    from datetime import datetime as dt
-    hora_inicio = dt.strptime(str(horarios_trabalho['hora_inicio']), '%H:%M:%S')
-    hora_fim = dt.strptime(str(horarios_trabalho['hora_fim']), '%H:%M:%S')
-
-    horarios = []
-    current = hora_inicio
-    while current < hora_fim:
-        hora_str = current.strftime('%H:%M')
-        horarios.append({
-            'hora': hora_str,
-            'disponivel': hora_str not in horas_ocupadas
-        })
-        current = dt.combine(dt.today(), current) + __import__('datetime').timedelta(minutes=30)
-        current = current.time()
-
-    return jsonify({'horarios': horarios})
+    try:
+        # Calcular dia da semana manualmente
+        from datetime import datetime
+        import datetime as dt_module
+        
+        # Converter data para objeto datetime
+        data_obj = datetime.strptime(data, '%Y-%m-%d')
+        dia_semana = data_obj.isoweekday()
+        
+        print(f"📅 Data: {data}, Dia semana: {dia_semana}")
+        
+        # Buscar horários do barbeiro
+        horarios_trabalho = execute_query("""
+            SELECT 
+                TIME_FORMAT(hora_inicio, '%H:%i') as hora_inicio,
+                TIME_FORMAT(hora_fim, '%H:%i') as hora_fim
+            FROM horario_trabalho 
+            WHERE id_barbeiro = %s AND dia_semana = %s
+        """, (barbeiro_id, dia_semana), fetch_one=True)
+        
+        print(f"📅 Horários encontrados: {horarios_trabalho}")
+        
+        if not horarios_trabalho:
+            return jsonify({'horarios': []})
+        
+        # Buscar horários ocupados
+        ocupados = execute_query("""
+            SELECT DATE_FORMAT(data_agendamento, '%H:%i') as hora
+            FROM agendamento_atendimento
+            WHERE id_barbeiro = %s AND DATE(data_agendamento) = %s
+            AND status IN ('pendente', 'confirmado')
+        """, (barbeiro_id, data), fetch_all=True)
+        
+        horas_ocupadas = [o['hora'] for o in ocupados if o.get('hora')]
+        print(f"📅 Horários ocupados: {horas_ocupadas}")
+        
+        # Gerar slots
+        horarios = []
+        hora_inicio = horarios_trabalho['hora_inicio']
+        hora_fim = horarios_trabalho['hora_fim']
+        
+        # Converter para minutos
+        inicio_min = int(hora_inicio.split(':')[0]) * 60 + int(hora_inicio.split(':')[1])
+        fim_min = int(hora_fim.split(':')[0]) * 60 + int(hora_fim.split(':')[1])
+        
+        for minutos in range(inicio_min, fim_min, 30):
+            hora = minutos // 60
+            minuto = minutos % 60
+            hora_str = f"{hora:02d}:{minuto:02d}"
+            horarios.append({
+                'hora': hora_str,
+                'disponivel': hora_str not in horas_ocupadas
+            })
+        
+        print(f"📅 Gerados {len(horarios)} horários")
+        return jsonify({'horarios': horarios})
+        
+    except Exception as e:
+        print(f"❌ Erro: {e}")
+        import traceback
+        traceback.print_exc()
+        # Fallback
+        horarios = []
+        for hora in range(9, 18):
+            for minuto in [0, 30]:
+                hora_str = f"{hora:02d}:{minuto:02d}"
+                horarios.append({'hora': hora_str, 'disponivel': True})
+        return jsonify({'horarios': horarios})

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barbeiros - El Bigdom</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar container">
+            <a href="/dashboard-barbearia" class="logo">
+                <span class="yellow">EL</span><span class="black">BIGODOM</span>
+            </a>
+            <div class="nav-links">
+                <a href="/dashboard-barbearia">Dashboard</a>
+                <a href="/dashboard-barbeiros" class="active">Barbeiros</a>
+                <a href="/dashboard-servicos">Serviços</a>
+                <a href="/dashboard-agendamentos">Agendamentos</a>
+                <a href="/dashboard-horarios">Horários</a>
+                <div id="user-menu" class="user-menu"></div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container" style="padding: 40px 0;">
+        <div class="section-header">
+            <h1>✂️ Gerenciar Barbeiros</h1>
+            <button class="btn-primary" onclick="abrirModalCadastro()">+ Novo Barbeiro</button>
+        </div>
+
+        <!-- Tabela de Barbeiros -->
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Telefone</th>
+                        <th>Especialidade</th>
+                        <th>Atendimentos</th>
+                        <th>Avaliação</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="barbeiros-tbody">
+                    <tr><td colspan="7" class="loading-spinner">Carregando...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Modal de Cadastro/Edição -->
+    <div id="modal-barbeiro" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3 id="modal-title">Novo Barbeiro</h3>
+                <span class="close-modal" onclick="fecharModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="barbeiro-form">
+                    <input type="hidden" id="barbeiro-id">
+                    <div class="form-group">
+                        <label for="nome">Nome completo *</label>
+                        <input type="text" id="nome" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">E-mail *</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="telefone">Telefone *</label>
+                        <input type="text" id="telefone" required placeholder="(99) 99999-9999">
+                    </div>
+                    <div class="form-group">
+                        <label for="especialidade">Especialidade</label>
+                        <input type="text" id="especialidade" placeholder="Ex: Corte Navalhado, Degradê...">
+                    </div>
+                    <div class="form-group">
+                        <label for="foto_url">URL da Foto</label>
+                        <input type="text" id="foto_url" placeholder="https://...">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="fecharModal()">Cancelar</button>
+                <button class="btn-primary" onclick="salvarBarbeiro()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Exclusão -->
+    <div id="modal-delete" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3>Confirmar Exclusão</h3>
+                <span class="close-modal" onclick="fecharModalDelete()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja remover <strong id="delete-nome"></strong>?</p>
+                <p style="font-size: 0.875rem; color: var(--danger);">Esta ação não poderá ser desfeita.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="fecharModalDelete()">Cancelar</button>
+                <button class="btn-danger" onclick="confirmarDelete()">Remover</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 El Bigdom - Todos os direitos reservados</p>
+        </div>
+    </footer>
+
+    <script src="/static/js/config.js"></script>
+    <script src="/static/js/utils.js"></script>
+    <script src="/static/js/auth.js"></script>
+    <script src="/static/js/barbeiros-crud.js"></script>
+</body>
+</html>

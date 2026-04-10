@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendamentos - El Bigdom</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar container">
+            <a href="/dashboard-barbearia" class="logo">
+                <span class="yellow">EL</span><span class="black">BIGODOM</span>
+            </a>
+            <div class="nav-links">
+                <a href="/dashboard-barbearia">Dashboard</a>
+                <a href="/dashboard-barbeiros">Barbeiros</a>
+                <a href="/dashboard-servicos">Serviços</a>
+                <a href="/dashboard-agendamentos" class="active">Agendamentos</a>
+                <a href="/dashboard-horarios">Horários</a>
+                <div id="user-menu" class="user-menu"></div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container" style="padding: 40px 0;">
+        <div class="section-header">
+            <h1>📋 Gerenciar Agendamentos</h1>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filtros-card card" style="margin-bottom: 24px;">
+            <div class="card-body">
+                <div class="filtros-grid">
+                    <div class="form-group">
+                        <label for="filtro-status">Status</label>
+                        <select id="filtro-status" onchange="aplicarFiltros()">
+                            <option value="">Todos</option>
+                            <option value="pendente">⏳ Pendente</option>
+                            <option value="confirmado">✅ Confirmado</option>
+                            <option value="concluido">✓ Concluído</option>
+                            <option value="cancelado">❌ Cancelado</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="filtro-data">Data</label>
+                        <input type="date" id="filtro-data" onchange="aplicarFiltros()">
+                    </div>
+                    <div class="form-group">
+                        <label for="filtro-barbeiro">Barbeiro</label>
+                        <select id="filtro-barbeiro" onchange="aplicarFiltros()">
+                            <option value="">Todos</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button class="btn-secondary" onclick="limparFiltros()">Limpar Filtros</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resumo -->
+        <div class="stats-resumo" id="stats-resumo">
+            <div class="stat-resumo pendente">
+                <span class="label">Pendentes</span>
+                <span class="value" id="total-pendente">0</span>
+            </div>
+            <div class="stat-resumo confirmado">
+                <span class="label">Confirmados</span>
+                <span class="value" id="total-confirmado">0</span>
+            </div>
+            <div class="stat-resumo concluido">
+                <span class="label">Concluídos</span>
+                <span class="value" id="total-concluido">0</span>
+            </div>
+            <div class="stat-resumo cancelado">
+                <span class="label">Cancelados</span>
+                <span class="value" id="total-cancelado">0</span>
+            </div>
+        </div>
+
+        <!-- Lista de Agendamentos -->
+        <div id="agendamentos-container" class="agendamentos-container">
+            <div class="loading-spinner">Carregando agendamentos...</div>
+        </div>
+    </main>
+
+    <!-- Modal de Detalhes -->
+    <div id="modal-detalhes" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3>Detalhes do Agendamento</h3>
+                <span class="close-modal" onclick="fecharModalDetalhes()">&times;</span>
+            </div>
+            <div class="modal-body" id="detalhes-content">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="fecharModalDetalhes()">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 El Bigdom - Todos os direitos reservados</p>
+        </div>
+    </footer>
+
+    <script src="/static/js/config.js"></script>
+    <script src="/static/js/utils.js"></script>
+    <script src="/static/js/auth.js"></script>
+    <script src="/static/js/agendamentos-dashboard.js"></script>
+</body>
+</html>

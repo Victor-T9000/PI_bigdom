@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meus Agendamentos - El BigDom</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/responsive.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar container">
+            <a href="/" class="logo">
+                <span class="yellow">EL</span><span class="black">BIGDOM</span>
+            </a>
+            <div class="nav-links">
+                <a href="/">Início</a>
+                <a href="/barbearias">Barbearias</a>
+                <a href="/galeria">Galeria</a>
+                <div id="user-menu" class="user-menu"></div>
+            </div>
+        </nav>
+    </header>
+    
+    <main class="container" style="padding: 40px 0;">
+        <h1 style="margin-bottom: 24px;">Meus Agendamentos</h1>
+        
+        <div id="agendamentos-container"></div>
+    </main>
+    
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 El BigDom - Todos os direitos reservados</p>
+        </div>
+    </footer>
+    
+    <!-- Modal de Avaliação -->
+    <div id="modal-avaliacao" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Avaliar Atendimento</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Nota (1 a 5 estrelas)</label>
+                    <div id="estrelas" style="display: flex; gap: 8px; font-size: 2rem; cursor: pointer;">
+                        ★★★★★
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="comentario">Comentário (opcional)</label>
+                    <textarea id="comentario" rows="4" placeholder="Deixe sua opinião sobre o atendimento..."></textarea>
+                </div>
+                <input type="hidden" id="avaliacao-agendamento-id">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="fecharModalAvaliacao()">Cancelar</button>
+                <button class="btn-primary" onclick="enviarAvaliacao()">Enviar Avaliação</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/static/js/config.js"></script>
+    <script src="/static/js/utils.js"></script>
+    <script src="/static/js/auth.js"></script>
+    <script src="/static/js/api.js"></script>
+    <script>
+        let notaSelecionada = 5;
+        let agendamentoAvaliando = null;
+        
+        async function carregarAgendamentos() {
+            mostrarLoading(true);
+            
+            try {
+                const agendamentos = await API.meusAgendamentos();
+                const container = document.getElementById('agendamentos-container');
+                
+                if (agendamentos.length === 0) {
+                    container.innerHTML = '<div class="card"><div class="card-body"><p>Você não tem agendamentos.</p><a href="/barbearias" class="btn-primary">Agendar Agora</a></div></div>';
+                    return;
+                }
+                
+                container.innerHTML = agendamentos.map(ag => `
+                    <div class="card" style="margin-bottom: 16px;">
+                        <div class="card-header">
+                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                                <span>${ag.barbearia_nome}</span>
+                                <span class="badge ${getStatusClass(ag.status)}">${getStatusText(ag.status)}</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Barbeiro:</strong> ${ag.barbeiro_nome}</p>
+                            <p><strong>Serviço:</strong> ${ag.servico_nome}</p>
+                            <p><strong>Valor:</strong> ${formatarMoeda(ag.preco)}</p>
+                            <p><strong>Data:</strong> ${formatarDataHora(ag.data_agendamento)}</p>
+                            ${ag.observacao ? `<p><strong>Observação:</strong> ${ag.observacao}</p>` : ''}
+                            
+                            <div style="display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap;">
+                                ${ag.status === 'pendente' ? `
+                                    <button class="btn-danger" onclick="cancelarAgendamento(${ag.id_agendamento})">Cancelar</button>
+                                ` : ''}
+                                ${ag.status === 'concluido' ? `
+                                    <button class="btn-primary" onclick="abrirModalAvaliacao(${ag.id_agendamento})">Avaliar</button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                mostrarMensagem('Erro ao carregar agendamentos', 'error');
+            } finally {
+                mostrarLoading(false);
+            }
+        }
+        
+        function getStatusClass(status) {
+            const classes = {
+                'pendente': 'badge-warning',
+                'confirmado': 'badge-success',
+                'cancelado': 'badge-danger',
+                'concluido': 'badge-info'
+            };
+            return classes[status] || 'badge-secondary';
+        }
+        
+        function getStatusText(status) {
+            const textos = {
+                'pendente': '⏳ Pendente',
+                'confirmado': '✅ Confirmado',
+                'cancelado': '❌ Cancelado',
+                'concluido': '✓ Concluído'
+            };
+            return textos[status] || status;
+        }
+        
+        async function cancelarAgendamento(id) {
+            if (confirm('Tem certeza que deseja cancelar este agendamento?')) {
+                mostrarLoading(true);
+                try {
+                    await API.cancelarAgendamento(id);
+                    mostrarMensagem('Agendamento cancelado com sucesso');
+                    carregarAgendamentos();
+                } catch (error) {
+                    mostrarMensagem(error.message, 'error');
+                } finally {
+                    mostrarLoading(false);
+                }
+            }
+        }
+        
+        function abrirModalAvaliacao(agendamentoId) {
+            agendamentoAvaliando = agendamentoId;
+            document.getElementById('avaliacao-agendamento-id').value = agendamentoId;
+            notaSelecionada = 5;
+            atualizarEstrelas();
+            document.getElementById('comentario').value = '';
+            document.getElementById('modal-avaliacao').classList.add('active');
+        }
+        
+        function fecharModalAvaliacao() {
+            document.getElementById('modal-avaliacao').classList.remove('active');
+            agendamentoAvaliando = null;
+        }
+        
+        function atualizarEstrelas() {
+            const container = document.getElementById('estrelas');
+            container.innerHTML = '';
+            for (let i = 1; i <= 5; i++) {
+                const star = document.createElement('span');
+                star.textContent = i <= notaSelecionada ? '★' : '☆';
+                star.style.color = '#FFD700';
+                star.style.cursor = 'pointer';
+                star.onclick = () => {
+                    notaSelecionada = i;
+                    atualizarEstrelas();
+                };
+                container.appendChild(star);
+            }
+        }
+        
+        async function enviarAvaliacao() {
+            const comentario = document.getElementById('comentario').value;
+            
+            mostrarLoading(true);
+            
+            try {
+                await API.criarAvaliacao({
+                    id_agendamento: agendamentoAvaliando,
+                    avaliacao: notaSelecionada,
+                    recomendacoes: comentario
+                });
+                
+                mostrarMensagem('Avaliação enviada com sucesso!');
+                fecharModalAvaliacao();
+                carregarAgendamentos();
+                
+            } catch (error) {
+                mostrarMensagem(error.message, 'error');
+            } finally {
+                mostrarLoading(false);
+            }
+        }
+        
+        document.querySelector('.close-modal').onclick = fecharModalAvaliacao;
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            const autenticado = await verificarAutenticacao(true);
+            if (autenticado) {
+                atualizarMenuUsuario();
+                carregarAgendamentos();
+            }
+        });
+    </script>
+</body>
+</html>

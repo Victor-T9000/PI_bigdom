@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Serviços - El Bigdom</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar container">
+            <a href="/dashboard-barbearia" class="logo">
+                <span class="yellow">EL</span><span class="black">BIGODOM</span>
+            </a>
+            <div class="nav-links">
+                <a href="/dashboard-barbearia">Dashboard</a>
+                <a href="/dashboard-barbeiros">Barbeiros</a>
+                <a href="/dashboard-servicos" class="active">Serviços</a>
+                <a href="/dashboard-agendamentos">Agendamentos</a>
+                <a href="/dashboard-horarios">Horários</a>
+                <div id="user-menu" class="user-menu"></div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container" style="padding: 40px 0;">
+        <div class="section-header">
+            <h1>💈 Gerenciar Serviços</h1>
+            <button class="btn-primary" onclick="abrirModalCadastro()">+ Novo Serviço</button>
+        </div>
+
+        <!-- Cards de Serviços -->
+        <div id="servicos-grid" class="servicos-grid">
+            <div class="loading-spinner">Carregando serviços...</div>
+        </div>
+    </main>
+
+    <!-- Modal de Cadastro/Edição -->
+    <div id="modal-servico" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3 id="modal-title">Novo Serviço</h3>
+                <span class="close-modal" onclick="fecharModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="servico-form">
+                    <input type="hidden" id="servico-id">
+                    <div class="form-group">
+                        <label for="nome">Nome do Serviço *</label>
+                        <input type="text" id="nome" required placeholder="Ex: Corte Masculino">
+                    </div>
+                    <div class="form-group">
+                        <label for="descricao">Descrição</label>
+                        <textarea id="descricao" rows="3" placeholder="Descreva o serviço..."></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="preco">Preço *</label>
+                            <input type="text" id="preco" required placeholder="R$ 0,00">
+                        </div>
+                        <div class="form-group">
+                            <label for="duracao">Duração (min)</label>
+                            <input type="number" id="duracao" value="30" min="5" step="5">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="categoria">Categoria</label>
+                        <select id="categoria">
+                            <option value="">Selecione</option>
+                            <option value="Cabelo">Cabelo</option>
+                            <option value="Barba">Barba</option>
+                            <option value="Combo">Combo</option>
+                            <option value="Acabamento">Acabamento</option>
+                            <option value="Tratamento">Tratamento</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="fecharModal()">Cancelar</button>
+                <button class="btn-primary" onclick="salvarServico()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Exclusão -->
+    <div id="modal-delete" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3>Confirmar Exclusão</h3>
+                <span class="close-modal" onclick="fecharModalDelete()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja remover o serviço <strong id="delete-nome"></strong>?</p>
+                <p style="font-size: 0.875rem; color: var(--danger);">Esta ação não poderá ser desfeita.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="fecharModalDelete()">Cancelar</button>
+                <button class="btn-danger" onclick="confirmarDelete()">Remover</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 El Bigdom - Todos os direitos reservados</p>
+        </div>
+    </footer>
+
+    <script src="/static/js/config.js"></script>
+    <script src="/static/js/utils.js"></script>
+    <script src="/static/js/auth.js"></script>
+    <script src="/static/js/servicos-crud.js"></script>
+</body>
+</html>

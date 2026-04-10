@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendar Horário - El BigDom</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/responsive.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar container">
+            <a href="/" class="logo">
+                <span class="yellow">EL</span><span class="black">BIGDOM</span>
+            </a>
+            <div class="nav-links">
+                <a href="/">Início</a>
+                <a href="/barbearias">Barbearias</a>
+                <a href="/galeria">Galeria</a>
+                <div id="user-menu" class="user-menu"></div>
+            </div>
+        </nav>
+    </header>
+    
+    <main class="container" style="padding: 40px 0;">
+        <h1 style="margin-bottom: 24px;">Agendar Horário</h1>
+        
+        <div class="card" style="margin-bottom: 24px;">
+            <div class="card-header">
+                <h3>Informações do Agendamento</h3>
+            </div>
+            <div class="card-body">
+                <div id="info-agendamento"></div>
+                
+                <div class="form-group">
+                    <label for="data">Selecione a Data</label>
+                    <input type="date" id="data" min="">
+                </div>
+                
+                <div id="horarios-container">
+                    <p>Selecione uma data para ver os horários disponíveis</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="observacao">Observação (opcional)</label>
+                    <textarea id="observacao" rows="3" placeholder="Alguma observação para o barbeiro?"></textarea>
+                </div>
+                
+                <button id="btn-confirmar" class="btn-primary btn-block" disabled>Confirmar Agendamento</button>
+            </div>
+        </div>
+    </main>
+    
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 El BigDom - Todos os direitos reservados</p>
+        </div>
+    </footer>
+    
+    <script src="/static/js/config.js"></script>
+    <script src="/static/js/utils.js"></script>
+    <script src="/static/js/auth.js"></script>
+    <script src="/static/js/api.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const barbeiroId = urlParams.get('barbeiro_id');
+        const barbeariaId = urlParams.get('barbearia_id');
+        
+        let barbeiroSelecionado = null;
+        let servicosDisponiveis = [];
+        let servicoSelecionado = null;
+        let dataSelecionada = null;
+        let horarioSelecionado = null;
+        
+        async function carregarDados() {
+            if (!barbeiroId) {
+                mostrarMensagem('Barbeiro não selecionado', 'error');
+                window.location.href = '/barbearias';
+                return;
+            }
+            
+            if (!isAutenticado()) {
+                mostrarMensagem('Faça login para agendar', 'warning');
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 1500);
+                return;
+            }
+            
+            mostrarLoading(true);
+            
+            try {
+                barbeiroSelecionado = await API.getBarbeiro(barbeiroId);
+                servicosDisponiveis = barbeiroSelecionado.servicos || [];
+                
+                document.getElementById('info-agendamento').innerHTML = `
+                    <p><strong>Barbeiro:</strong> ${barbeiroSelecionado.nome}</p>
+                    <p><strong>Barbearia:</strong> ${barbeiroSelecionado.barbearia_nome}</p>
+                    <div class="form-group">
+                        <label for="servico">Escolha o Serviço</label>
+                        <select id="servico">
+                            <option value="">Selecione um serviço</option>
+                            ${servicosDisponiveis.map(s => `
+                                <option value="${s.id_servico}" data-preco="${s.preco}" data-duracao="${s.duracao_minutos}">
+                                    ${s.nome} - ${formatarMoeda(s.preco)} (${s.duracao_minutos} min)
+                                </option>
+                            `).join('')}
+                        </select>
+                    </div>
+                `;
+                
+                document.getElementById('servico').addEventListener('change', (e) => {
+                    const selected = e.target.selectedOptions[0];
+                    if (selected.value) {
+                        servicoSelecionado = servicosDisponiveis.find(s => s.id_servico == selected.value);
+                        verificarHabilitarBotao();
+                    } else {
+                        servicoSelecionado = null;
+                        verificarHabilitarBotao();
+                    }
+                });
+                
+                // Data mínima (hoje)
+                const hoje = new Date().toISOString().split('T')[0];
+                document.getElementById('data').min = hoje;
+                
+            } catch (error) {
+                mostrarMensagem('Erro ao carregar dados', 'error');
+            } finally {
+                mostrarLoading(false);
+            }
+        }
+        
+        document.getElementById('data').addEventListener('change', async (e) => {
+            dataSelecionada = e.target.value;
+            
+            if (!dataSelecionada) return;
+            
+            mostrarLoading(true);
+            
+            try {
+                const response = await API.getHorariosBarbeiro(barbeiroId, dataSelecionada);
+                const horarios = response.horarios || [];
+                
+                const container = document.getElementById('horarios-container');
+                
+                if (horarios.length === 0) {
+                    container.innerHTML = '<p>Nenhum horário disponível para esta data.</p>';
+                    verificarHabilitarBotao();
+                    return;
+                }
+                
+                container.innerHTML = `
+                    <label>Horários Disponíveis</label>
+                    <div class="horarios-grid">
+                        ${horarios.map(h => `
+                            <div class="horario-slot ${h.disponivel ? 'disponivel' : 'indisponivel'}" 
+                                 data-hora="${h.hora}"
+                                 data-disponivel="${h.disponivel}">
+                                ${h.hora}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
+                // Adicionar eventos de clique nos horários
+                document.querySelectorAll('.horario-slot.disponivel').forEach(slot => {
+                    slot.addEventListener('click', () => {
+                        document.querySelectorAll('.horario-slot').forEach(s => s.classList.remove('selecionado'));
+                        slot.classList.add('selecionado');
+                        horarioSelecionado = slot.dataset.hora;
+                        verificarHabilitarBotao();
+                    });
+                });
+                
+                verificarHabilitarBotao();
+                
+            } catch (error) {
+                mostrarMensagem('Erro ao carregar horários', 'error');
+            } finally {
+                mostrarLoading(false);
+            }
+        });
+        
+        function verificarHabilitarBotao() {
+            const btn = document.getElementById('btn-confirmar');
+            if (servicoSelecionado && dataSelecionada && horarioSelecionado) {
+                btn.disabled = false;
+            } else {
+                btn.disabled = true;
+            }
+        }
+        
+        document.getElementById('btn-confirmar').addEventListener('click', async () => {
+            const dataHora = `${dataSelecionada} ${horarioSelecionado}:00`;
+            const observacao = document.getElementById('observacao').value;
+            
+            mostrarLoading(true);
+            
+            try {
+                await API.criarAgendamento({
+                    id_barbeiro: parseInt(barbeiroId),
+                    id_servico: servicoSelecionado.id_servico,
+                    data_agendamento: dataHora,
+                    observacao: observacao
+                });
+                
+                mostrarMensagem('Agendamento realizado com sucesso!');
+                setTimeout(() => {
+                    window.location.href = '/meus-agendamentos';
+                }, 1500);
+                
+            } catch (error) {
+                mostrarMensagem(error.message, 'error');
+            } finally {
+                mostrarLoading(false);
+            }
+        });
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            atualizarMenuUsuario();
+            carregarDados();
+        });
+    </script>
+</body>
+</html>

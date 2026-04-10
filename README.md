@@ -1,9 +1,9 @@
 Instalação
 bash
 # 1. Clonar o repositório
-git clone https://github.com/seu-usuario/elbigodom.git
+git clone https://github.com/seu-usuario/elbigdom.git
 
-cd elbigodom
+cd elbigdom
 
 # 2. Criar ambiente virtual
 python -m venv venv

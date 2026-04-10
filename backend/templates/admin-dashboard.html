@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - El Bigdom</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar container">
+            <a href="/admin/dashboard" class="logo">
+                <span class="yellow">EL</span><span class="black">BIGODOM</span>
+                <span class="admin-badge">ADMIN</span>
+            </a>
+            <div class="nav-links">
+                <a href="/admin/dashboard" class="active">Dashboard</a>
+                <a href="/admin/barbearias">Barbearias</a>
+                <a href="/admin/pendentes">Aprovações</a>
+                <div id="user-menu" class="user-menu"></div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container" style="padding: 40px 0;">
+        <h1>Painel Administrativo</h1>
+        <p>Gerencie todas as barbearias da plataforma</p>
+
+        <!-- Cards de Estatísticas -->
+        <div class="admin-stats">
+            <div class="stat-card">
+                <div class="stat-icon">🏪</div>
+                <div class="stat-info">
+                    <h3 id="total-barbearias">0</h3>
+                    <p>Barbearias</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✂️</div>
+                <div class="stat-info">
+                    <h3 id="total-barbeiros">0</h3>
+                    <p>Barbeiros</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">👤</div>
+                <div class="stat-info">
+                    <h3 id="total-clientes">0</h3>
+                    <p>Clientes</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📅</div>
+                <div class="stat-info">
+                    <h3 id="total-agendamentos">0</h3>
+                    <p>Agendamentos</p>
+                </div>
+            </div>
+            <div class="stat-card warning">
+                <div class="stat-icon">⏳</div>
+                <div class="stat-info">
+                    <h3 id="pendentes">0</h3>
+                    <p>Aguardando Aprovação</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráfico de Agendamentos -->
+        <div class="card" style="margin-top: 24px;">
+            <div class="card-header">
+                <h3>Agendamentos por Mês</h3>
+            </div>
+            <div class="card-body">
+                <canvas id="grafico-agendamentos" height="200"></canvas>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/static/js/config.js"></script>
+    <script src="/static/js/utils.js"></script>
+    <script src="/static/js/admin.js"></script>
+</body>
+</html>
